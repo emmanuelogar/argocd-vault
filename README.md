@@ -73,7 +73,7 @@ kubectl port-forward service/api 5000:5000 -n schoolapp
 ## Test the School App with Hardcoded Secrets
 Try creating and deleting a course and check the logs of the api pod.
 ```bash
-kubectl logs -n schoolapp -f $(kubectl get pods --template '{{range .items}}{{.metadata.name}}{{end}}' --selector=app=api) -c api
+kubectl logs -n schoolapp -f $(kubectl get pods -n schoolapp -l app=api -o jsonpath='{.items[0].metadata.name}') -c api
 ```
 Notice this output:
 Expected Output
@@ -94,23 +94,16 @@ helm install vault --namespace vault \
     hashicorp/vault
 ```
 ## Initialize and Unseal Vault
-Next we'll initialize and unseal Vault. Make sure to save your root token and unseal key
-First exec into the vault container:
+Next run the vault-init.sh script to initialize and unseal Vault.
 ```bash
-kubectl exec -it pod/vault-0 -- sh
-```
-Then run these commands
-```bash
-vault operator init -key-shares=1 -key-threshold=1
-vault operator unseal <UNSEAL_KEY>
-# Example:
-vault operator unseal ox7fCUNO52KptEPJkycF1miOI28pZEUWQQms5kLkgCY=
+./vault-init.sh
 ```
 ## Prepare Vault for the School App
 Let's prepare Vault to serve the MongoDB credentials to the API.
 ## Login to Vault
 Let's now log in to Vault (while still inside the vault container)
 ```bash
+kubectl exec -it pod/vault-0 -- sh
 # export the vault address and login
 export VAULT_ADDR=http://127.0.0.1:8200
 vault login <ROOT_TOKEN>
