@@ -190,7 +190,7 @@ kubectl port-forward service/api 5000:5000 -n schoolapp
 ```
 Try creating and deleting a course and check the logs of the api pod.
 ```bash
-kubectl logs -n schoolapp -f $(kubectl get pods --template '{{range .items}}{{.metadata.name}}{{end}}' --selector=app=api) -c api
+kubectl logs -n schoolapp -f $(kubectl get pods -n schoolapp -l app=api -o jsonpath='{.items[0].metadata.name}') -c api
 ```
 Notice this output:
 **Expected Output**
