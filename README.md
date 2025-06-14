@@ -59,6 +59,14 @@ Now let's see how to use a GitOps approach with ArgoCD to run our school app.
 kubectl delete ns schoolapp
 ```
 ## Create the School App Application in ArgoCD
+before running the below command first update the vaule.yaml file 
+
+```bash
+schoolapp-api:
+  vault:
+    status: 'disable'
+    kind: 'disable'
+```
 ```bash
 kubectl apply -f argocdSchoolApp.yaml
 ```
@@ -92,6 +100,10 @@ helm install vault --namespace vault \
     --set injector.enabled=true \
     --set csi.enabled=false \
     hashicorp/vault
+
+    # or run script
+
+./vault-setup.sh
 ```
 ## Initialize and Unseal Vault
 Next run the vault-init.sh script to initialize and unseal Vault.
@@ -103,7 +115,7 @@ Let's prepare Vault to serve the MongoDB credentials to the API.
 ## Login to Vault
 Let's now log in to Vault (while still inside the vault container)
 ```bash
-kubectl exec -it pod/vault-0 -- sh
+kubectl exec -it pod/vault-0 -n vault -- sh
 # export the vault address and login
 export VAULT_ADDR=http://127.0.0.1:8200
 vault login <ROOT_TOKEN>
